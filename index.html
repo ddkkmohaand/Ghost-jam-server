@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الزحمة الوهمية</title>
+<style>
+  :root { color-scheme: dark; --bg:#0b1220; --panel:#16233b; --fg:#f8fafc; --muted:#94a3b8; --amber:#f59e0b; --red:#ef4444; --green:#22c55e; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px "Segoe UI", Tahoma, Arial, sans-serif; line-height:1.7; }
+  main { padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:24px 48px; max-width:720px; margin:auto; }
+  h1 { font-size:34px; margin:8px 0 0; }
+  h2 { font-size:22px; margin:0 0 10px; }
+  .tag { color:var(--amber); font-weight:700; }
+  .lead { color:var(--muted); font-size:18px; margin:6px 0 20px; }
+  section { background:var(--panel); border-radius:16px; padding:18px; margin-top:16px; }
+  ol, ul { padding-right:20px; margin:0; } li { margin:6px 0; }
+  .steps { display:grid; gap:10px; }
+  .step { display:flex; gap:12px; align-items:flex-start; }
+  .num { min-width:34px; height:34px; border-radius:50%; background:var(--amber); color:#0b1220; font-weight:800; display:grid; place-items:center; }
+  button { background:var(--amber); color:#0b1220; border:0; border-radius:12px; padding:12px 18px; font:inherit; font-weight:700; cursor:pointer; margin:4px 4px 4px 0; }
+  button.alt { background:#334155; color:var(--fg); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  button:focus-visible { outline:3px solid var(--fg); outline-offset:2px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+  .chip { background:#0f1a2e; border-radius:999px; padding:6px 12px; font-size:14px; color:var(--muted); }
+  .chip.ok { color:var(--green); } .chip.bad { color:var(--red); }
+  #log { background:#0f1a2e; border-radius:12px; padding:10px 12px; font-size:14px; color:var(--muted); min-height:90px; max-height:220px; overflow:auto; white-space:pre-wrap; }
+  #alert { position:fixed; left:12px; right:12px; bottom:max(16px, env(safe-area-inset-bottom,0px)); background:var(--red); color:#fff; border-radius:16px; padding:16px 18px; font-size:20px; font-weight:800; text-align:center; transform:translateY(160%); transition:transform .3s ease; box-shadow:0 10px 30px #0008; }
+  #alert.show { transform:translateY(0); }
+  .note { color:var(--muted); font-size:14px; }
+  code { background:#0f1a2e; padding:2px 6px; border-radius:6px; direction:ltr; display:inline-block; }
+  @media (prefers-reduced-motion: reduce) { #alert { transition:none; } }
+</style>
+</head>
+<body>
+<main>
+  <p class="tag">Ghost Jam</p>
+  <h1>الزحمة الوهمية</h1>
+  <p class="lead">فرملة واحدة صغيرة ممكن تعمل زحمة من غير حادث. الفكرة إن التنبيه يوصل للي وراك قبل ما الفرملة تتضخم.</p>
+
+  <section>
+    <h2>إزاي الفكرة بتشتغل؟</h2>
+    <div class="steps">
+      <div class="step"><span class="num">١</span><div>العربية بتفرمل بقوة، والهاتف بيحس بيها.</div></div>
+      <div class="step"><span class="num">٢</span><div>الهاتف بيبعت الخبر للسيرفر: "أنا فرملت".</div></div>
+      <div class="step"><span class="num">٣</span><div>السيرفر بيبعت التنبيه للعربيات اللي ورا على نفس الطريق في نطاق ٥٠٠ متر.</div></div>
+      <div class="step"><span class="num">٤</span><div>هاتف السواق اللي ورا بيهتز، والسواق يفرمل بهدوء.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>جرّب التجربة</h2>
+    <p class="note">افتح الصفحة على هاتفين في مكانين قريبين، واسمح بالموقع وحساس الحركة. التجربة بتشتغل مع الصفحة مفتوحة.</p>
+    <div class="chips">
+      <span class="chip" id="cLoc">الموقع: متوقف</span>
+      <span class="chip" id="cMot">الحساس: متوقف</span>
+      <span class="chip" id="cNet">الاتصال: متوقف</span>
+    </div>
+    <button id="start">ابدأ التجربة</button>
+    <button id="test" class="alt" disabled>فرملة تجريبية</button>
+    <p class="note">الفرملة الحقيقية بتتكشف من الحساس وسرعة الـ GPS، وتقدر تجرب الزرار التجريبي من غير حركة.</p>
+    <div id="log">في انتظار البداية...</div>
+  </section>
+
+  <section>
+    <h2>ملاحظات</h2>
+    <ul>
+      <li>على الآيفون الاهتزاز مش متاح في المتصفح، فالتنبيه بيظهر على الشاشة ويطلع صوت.</li>
+      <li>الصفحة لازم تفضل مفتوحة. التطبيق الكامل بيشتغل في الخلفية، وده الخطوة الجاية.</li>
+      <li>الأرقام والكشف عن الفرملة تجريبيين، ومحتاجين اختبار على طرق حقيقية.</li>
+    </ul>
+  </section>
+</main>
+
+<div id="alert" role="alert" aria-live="assertive"></div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const myId = (() => {
+    try {
+      let v = localStorage.getItem("gj-id");
+      if (!v) { v = crypto.randomUUID(); localStorage.setItem("gj-id", v); }
+      return v;
+    } catch { return crypto.randomUUID(); }
+  })();
+
+  const TH_MS2 = 4.5;      // حد التسارع (م/ث²) اللي يعتبر فرملة قوية
+  const DROP_MS = 2;       // أقل انخفاض في السرعة خلال ١.٥ ثانية
+  const pos = { lat: null, lng: null, heading: 0, speed: null };
+  const speeds = [];       // [time, speed]
+  let es = null, lastBrakeAt = 0, audio = null, started = false;
+
+  function log(msg) {
+    const t = new Date().toLocaleTimeString("ar-AE", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    $("log").textContent = `[${t}] ${msg}\n` + $("log").textContent;
+  }
+  function chip(id, text, ok) {
+    const el = $(id); el.textContent = text;
+    el.className = "chip " + (ok === true ? "ok" : ok === false ? "bad" : "");
+  }
+
+  function beep() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = 880; g.gain.value = 0.2;
+      o.connect(g); g.connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + 0.4);
+    } catch {}
+  }
+
+  function showAlert(text) {
+    const a = $("alert");
+    a.textContent = text;
+    a.classList.add("show");
+    clearTimeout(showAlert.t);
+    showAlert.t = setTimeout(() => a.classList.remove("show"), 6000);
+    beep();
+    try { navigator.vibrate && navigator.vibrate([400, 200, 400]); } catch {}
+  }
+
+  async function post(path, body) {
+    try {
+      const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      return r.ok ? await r.json().catch(() => ({})) : null;
+    } catch { return null; }
+  }
+
+  function sendBrake() {
+    const now = Date.now();
+    if (now - lastBrakeAt < 5000) return;     // ما نبعتش أكتر من مرة كل ٥ ثواني
+    lastBrakeAt = now;
+    if (pos.lat == null) { log("مفيش موقع بعد، مش هقدر أبعت الفرملة."); return; }
+    post("/brake", { id: myId, eventId: crypto.randomUUID(), lat: pos.lat, lng: pos.lng, heading: pos.heading })
+      .then((r) => log(r ? `اتبعت الفرملة. عدد العربيات اللي اتنبهت: ${r.sent ?? 0}` : "فشل الإرسال للسيرفر."));
+  }
+
+  function speedDrop() {
+    const now = Date.now();
+    const old = speeds.find(([t]) => now - t <= 1600);
+    if (!old || pos.speed == null) return 0;
+    return old[1] - pos.speed;
+  }
+
+  function onMotion(e) {
+    const a = e.acceleration;
+    if (!a || a.x == null) return;
+    const mag = Math.hypot(a.x, a.y, a.z);
+    if (mag >= TH_MS2 && speedDrop() >= DROP_MS) sendBrake();
+  }
+
+  function onPos(p) {
+    pos.lat = p.coords.latitude; pos.lng = p.coords.longitude;
+    pos.speed = p.coords.speed ?? null;
+    if (p.coords.heading != null && pos.speed > 2) pos.heading = p.coords.heading;
+    speeds.push([Date.now(), pos.speed ?? 0]);
+    while (speeds.length && Date.now() - speeds[0][0] > 4000) speeds.shift();
+    chip("cLoc", "الموقع: شغال", true);
+    if (!es) connect();
+  }
+
+  function connect() {
+    const q = new URLSearchParams({ id: myId, lat: pos.lat, lng: pos.lng, heading: pos.heading });
+    es = new EventSource("/events?" + q.toString());
+    es.onopen = () => { chip("cNet", "الاتصال: متصل", true); log("اتصلت بالسيرفر، مستنيين التنبيهات."); };
+    es.onerror = () => chip("cNet", "الاتصال: بيعيد الاتصال", false);
+    es.addEventListener("warn", (e) => {
+      const d = JSON.parse(e.data).distance;
+      log(`تنبيه: فرملة قدامك على بعد ${d} متر`);
+      showAlert(`فرملة قدامك على بعد ${d} متر`);
+    });
+  }
+
+  function startPositionLoop() {
+    setInterval(() => {
+      if (pos.lat != null) post("/position", { id: myId, lat: pos.lat, lng: pos.lng, heading: pos.heading });
+    }, 2000);
+  }
+
+  async function start() {
+    if (started) return;
+    started = true;
+    $("start").disabled = true;
+    $("test").disabled = false;
+    try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+
+    if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
+      try {
+        const r = await DeviceMotionEvent.requestPermission();
+        chip("cMot", "الحساس: " + (r === "granted" ? "شغال" : "متمنع"), r === "granted");
+        if (r === "granted") window.addEventListener("devicemotion", onMotion);
+      } catch { chip("cMot", "الحساس: متمنع", false); }
+    } else if (window.DeviceMotionEvent) {
+      window.addEventListener("devicemotion", onMotion);
+      chip("cMot", "الحساس: شغال", true);
+    } else {
+      chip("cMot", "الحساس: مش متاح", false);
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(onPos, (err) => {
+        chip("cLoc", "الموقع: متمنع", false);
+        log("الموقع مش متاح: " + err.message);
+      }, { enableHighAccuracy: true, maximumAge: 1000 });
+    } else {
+      chip("cLoc", "الموقع: مش متاح", false);
+    }
+    startPositionLoop();
+    log("بدأت التجربة. لو حسيت بفرملة قوية هتتبعت تلقائياً.");
+  }
+
+  $("start").addEventListener("click", start);
+  $("test").addEventListener("click", () => { log("فرملة تجريبية"); lastBrakeAt = 0; sendBrake(); });
+})();
+</script>
+</body>
+</html>

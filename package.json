@@ -1,0 +1,14 @@
+{
+  "name": "ghost-jam-server",
+  "version": "1.0.0",
+  "description": "سيرفر تجريبي للتنبيه بالفرملة القوية",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}
