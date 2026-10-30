@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>Flow — الزحمة الوهمية</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a1120;
+    --card-a: #17243dcc;
+    --card-b: #0e1829e6;
+    --line: #ffffff17;
+    --fg: #f8fafc;
+    --muted: #94a3b8;
+    --amber: #f59e0b;
+    --orange: #f97316;
+    --blue: #38bdf8;
+    --red: #ef4444;
+    --green: #22c55e;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--fg);
+    background:
+      radial-gradient(800px 500px at 92% -8%, #1d4ed833, transparent 60%),
+      radial-gradient(700px 480px at -12% 34%, #f9731624, transparent 60%),
+      var(--bg);
+    font: 16px/1.7 "Segoe UI", Tahoma, Arial, sans-serif;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse at top, #000 25%, transparent 75%);
+            mask-image: radial-gradient(ellipse at top, #000 25%, transparent 75%);
+  }
+  main, header.top, nav.bottom { position: relative; z-index: 1; }
+  main { max-width: 720px; margin: 0 auto; padding: 8px 16px 120px; }
+
+  /* الشريط العلوي */
+  header.top { position: sticky; top: 0; z-index: 5; background: rgba(10,17,32,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  header.top .in { max-width: 720px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .logo { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 22px; background: linear-gradient(135deg, #fbbf24, var(--orange)); box-shadow: 0 8px 22px #f59e0b55, inset 0 1px 0 #ffffff55; }
+  .brand b { display: block; font-size: 21px; line-height: 1.1; letter-spacing: .5px; background: linear-gradient(90deg, #fde68a, #fb923c 50%, #7dd3fc); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  .brand small { color: var(--muted); }
+  .spacer { flex: 1; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #475569; transition: background .3s, box-shadow .3s; }
+  .dot.on { background: var(--green); box-shadow: 0 0 0 4px #22c55e2e, 0 0 14px #22c55e; }
+
+  /* البطاقات */
+  .hero, .card {
+    position: relative; margin-top: 16px; padding: 22px 18px; border-radius: 24px;
+    background: linear-gradient(180deg, var(--card-a), var(--card-b));
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 60px -24px #000c, inset 0 1px 0 #ffffff12;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .hero { margin-top: 18px; padding: 26px 20px 22px; overflow: hidden; }
+  .hero::after { content: ""; position: absolute; width: 320px; height: 320px; left: -120px; top: -140px; border-radius: 50%; background: radial-gradient(circle, #f59e0b30, transparent 65%); pointer-events: none; }
+  .hero h1 { position: relative; font-size: 30px; line-height: 1.35; margin: 10px 0 10px; font-weight: 900; }
+  .grad { background: linear-gradient(90deg, #fde68a, #fb923c 45%, #7dd3fc); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  .hero p { position: relative; color: #cbd5e1; margin: 0 0 18px; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #fde68a; background: #f59e0b1f; border: 1px solid #f59e0b55; padding: 4px 12px; border-radius: 999px; }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+  .card h2 { font-size: 21px; margin: 0 0 4px; }
+  .eyebrow-sm { color: var(--blue); font-size: 13px; font-weight: 800; letter-spacing: .4px; margin-bottom: 2px; }
+  .card > p.sub { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+  .center { text-align: center; }
+
+  /* الأزرار */
+  button { background: linear-gradient(135deg, #fbbf24, var(--orange)); color: #111827; border: 0; border-radius: 15px; padding: 12px 18px; font: inherit; font-weight: 800; cursor: pointer; transition: transform .15s ease, box-shadow .2s ease, filter .2s; box-shadow: 0 10px 24px -10px #f59e0bcc; }
+  button:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
+  button:active:not(:disabled) { transform: translateY(1px) scale(.99); }
+  button.alt { background: linear-gradient(135deg, #334155, #1e293b); color: var(--fg); box-shadow: none; border: 1px solid var(--line); }
+  button:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
+  button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .cta { position: relative; overflow: hidden; width: 100%; font-size: 19px; padding: 18px; box-shadow: 0 14px 34px -10px #f59e0b; }
+  .cta::after { content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(120deg, transparent, #ffffff70, transparent); transform: skewX(-20deg); animation: shine 3.4s ease-in-out infinite; }
+  .cta:disabled::after { display: none; }
+  @keyframes shine { 0% { left: -60%; } 55%, 100% { left: 130%; } }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .row button { flex: 1; min-width: 160px; }
+
+  /* الحالة */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; background: #0b1424aa; border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; font-size: 14px; color: var(--muted); }
+  .chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #475569; }
+  .chip.ok { color: #bbf7d0; border-color: #22c55e55; } .chip.ok::before { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .chip.bad { color: #fecaca; border-color: #ef444455; } .chip.bad::before { background: var(--red); }
+
+  /* الرادار */
+  .radar { position: relative; width: 230px; height: 230px; margin: 26px auto 8px; border-radius: 50%; border: 1px solid #38bdf833; overflow: hidden; background: radial-gradient(circle at center, #0c2d4a 0%, #0a1120 72%); box-shadow: 0 0 60px -10px #38bdf855, inset 0 0 40px #000; }
+  .radar .grid-ring { position: absolute; inset: 0; margin: auto; border-radius: 50%; border: 1px solid #38bdf833; }
+  .radar .r1 { width: 70%; height: 70%; } .radar .r2 { width: 40%; height: 40%; }
+  .radar .cross { position: absolute; inset: 0; margin: auto; width: 100%; height: 1px; background: #38bdf822; }
+  .radar .cross.v { width: 1px; height: 100%; }
+  .ping { position: absolute; left: 50%; top: 50%; width: 100%; height: 100%; margin: -50% 0 0 -50%; border-radius: 50%; border: 1px solid #38bdf8; opacity: 0; animation: ping 3s ease-out infinite; }
+  .ping.p2 { animation-delay: 1.5s; }
+  @keyframes ping { 0% { transform: scale(.05); opacity: .9; } 100% { transform: scale(1); opacity: 0; } }
+  .sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, rgba(56,189,248,.55), rgba(56,189,248,0) 30%); animation: spin 3.2s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .blip { position: absolute; width: 11px; height: 11px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 14px var(--blue); animation: glow 2.4s ease-in-out infinite; }
+  @keyframes glow { 50% { transform: scale(1.35); opacity: .7; } }
+  .b1 { top: 24%; left: 66%; } .b2 { top: 68%; left: 28%; animation-delay: .8s; }
+  .b3 { top: 16%; left: 26%; background: var(--amber); box-shadow: 0 0 14px var(--amber); animation-delay: 1.4s; }
+  .me { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 6px #22c55e33, 0 0 18px var(--green); }
+
+  .note { color: var(--muted); font-size: 14px; margin: 10px 0 0; }
+  #log { background: #070d1acc; border: 1px solid var(--line); border-radius: 16px; padding: 14px; font: 14px/1.8 ui-monospace, "Segoe UI", monospace; color: #cbd5e1; min-height: 120px; max-height: 240px; overflow: auto; white-space: pre-wrap; margin-top: 14px; }
+
+  /* خطوات الشرح */
+  .steps { display: grid; gap: 12px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; background: #0b1424aa; border: 1px solid var(--line); border-radius: 18px; padding: 14px; transition: transform .25s ease, border-color .25s; }
+  .step:hover { transform: translateY(-2px); border-color: #38bdf855; }
+  .num { flex: 0 0 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #38bdf8, #6366f1); color: #fff; font-weight: 900; display: grid; place-items: center; box-shadow: 0 8px 18px -6px #6366f1aa; }
+  .step b { display: block; font-size: 17px; }
+  .step span { color: var(--muted); font-size: 15px; }
+
+  /* الخصوصية والإعدادات */
+  ul.check { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  ul.check li { display: flex; gap: 10px; align-items: flex-start; }
+  ul.check li::before { content: "✓"; flex: 0 0 22px; height: 22px; border-radius: 50%; background: #22c55e22; color: var(--green); font-weight: 900; font-size: 13px; display: grid; place-items: center; margin-top: 2px; }
+  .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #0b1424aa; border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; cursor: pointer; }
+  .switch-row input { width: 22px; height: 22px; accent-color: var(--amber); }
+
+  /* نظام النقاط */
+  .score { display: flex; align-items: center; gap: 16px; }
+  .score-num { min-width: 110px; font-size: 48px; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #fde68a, #fb923c 50%, #7dd3fc); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  .score-num.bump { animation: pop .45s ease; }
+  .score-meta { flex: 1; }
+  .level { font-weight: 800; color: var(--blue); }
+  .bar { height: 10px; border-radius: 999px; background: #0b1424; border: 1px solid var(--line); overflow: hidden; margin: 8px 0 4px; }
+  .bar i { display: block; height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, #f59e0b, #38bdf8); transition: width .6s ease; }
+  .score-rule { color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+
+  /* موجة الفرملة (توضيحي) */
+  .road { position: relative; height: 130px; margin-top: 14px; border-radius: 18px; overflow: hidden; background: linear-gradient(90deg, #0b1424, #13213b 50%, #0b1424); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-evenly; padding: 0 12px; }
+  .road::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: repeating-linear-gradient(90deg, #ffffff26 0 18px, transparent 18px 36px); }
+  .car { position: relative; display: block; flex: 0 0 auto; width: 44px; height: 22px; border-radius: 7px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); box-shadow: 0 6px 14px #0009; animation: squeeze 2.8s ease-in-out infinite; animation-delay: calc(var(--d) * .22s); }
+  .car::after { content: ""; position: absolute; left: 3px; top: 3px; width: 6px; height: 16px; border-radius: 3px; background: var(--red); animation: lamp 2.8s ease-in-out infinite; animation-delay: calc(var(--d) * .22s); }
+  @keyframes lamp { 0%, 100% { opacity: .3; box-shadow: none; } 15%, 35% { opacity: 1; box-shadow: 0 0 14px 4px #ef444488; } }
+  @keyframes squeeze { 0%, 100% { transform: scaleX(1); } 15%, 35% { transform: scaleX(.92); } }
+
+  /* إطار متدرج للبطاقة الرئيسية */
+  .hero { border: 1px solid transparent; background: linear-gradient(160deg, #1d3557 0%, var(--card) 70%) padding-box, linear-gradient(120deg, #f59e0b, #38bdf8, #a78bfa) border-box; }
+  .hero h1 { animation: rise .9s .1s both; }
+  .hero .badge { animation: rise .6s both; }
+
+  /* شاشة الافتتاح */
+  #splash { position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--bg); transition: opacity .6s ease, visibility .6s; }
+  #splash.hide { opacity: 0; visibility: hidden; }
+  #splash .logo { width: 92px; height: 92px; font-size: 46px; border-radius: 28px; animation: pop .8s cubic-bezier(.2, 1.4, .4, 1) both; }
+  #splash .name { font-size: 44px; font-weight: 900; letter-spacing: 3px; animation: rise .8s .15s both; }
+  #splash .name span { background: linear-gradient(90deg, #fde68a, #fb923c 50%, #7dd3fc); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  @keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* القائمة السفلية */
+  nav.bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(10,17,32,.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  nav.bottom a { color: var(--muted); text-decoration: none; text-align: center; padding: 13px 4px; font-size: 14px; transition: color .2s; }
+  nav.bottom a:hover, nav.bottom a:focus-visible { color: var(--fg); }
+
+  /* تنبيه يظهر فوق كل حاجة */
+  #alert { position: fixed; left: 12px; right: 12px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); z-index: 10; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; border-radius: 18px; padding: 16px 18px; font-size: 20px; font-weight: 900; text-align: center; box-shadow: 0 14px 40px -8px #ef4444aa; opacity: 0; visibility: hidden; transform: translateY(24px); pointer-events: none; transition: opacity .3s ease, transform .3s ease, visibility .3s; }
+  #alert.show { opacity: 1; visibility: visible; transform: translateY(0); animation: alertGlow 1.2s ease-in-out 3; }
+  @keyframes alertGlow { 50% { box-shadow: 0 14px 56px 6px #ef4444cc; } }
+
+  footer { color: #64748b; font-size: 13px; text-align: center; margin-top: 26px; }
+
+  /* ظهور تدريجي عند التمرير */
+  .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  @media (min-width: 640px) {
+    .steps { grid-template-columns: 1fr 1fr; }
+    .hero h1 { font-size: 36px; }
+    .card:hover, .hero:hover { border-color: #ffffff26; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .js .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="splash" aria-hidden="true">
+  <div class="logo">⚡</div>
+  <div class="name"><span>Flow</span></div>
+</div>
+
+<header class="top">
+  <div class="in">
+    <div class="logo" aria-hidden="true">⚡</div>
+    <div class="brand"><b>Flow</b><small>الزحمة الوهمية</small></div>
+    <div class="spacer"></div>
+    <span class="dot" id="live" title="حالة الاتصال"></span>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero reveal" id="home">
+    <span class="badge">نموذج أولي للتجربة</span>
+    <h1>نبِّه قبل أن تتكوّن <span class="grad">الزحمة</span></h1>
+    <p>قد تتسبب فرملة واحدة صغيرة في زحمة دون حادث. يوصل Flow التنبيه إلى السائق الذي خلفك قبل أن تتضخم الفرملة.</p>
+    <button id="start" class="cta">ابدأ التجربة</button>
+
+    <div class="chips">
+      <span class="chip" id="cLoc">الموقع: متوقف</span>
+      <span class="chip" id="cMot">المستشعر: متوقف</span>
+      <span class="chip" id="cNet">الاتصال: متوقف</span>
+    </div>
+
+    <div class="radar" aria-hidden="true">
+      <div class="grid-ring r1"></div>
+      <div class="grid-ring r2"></div>
+      <div class="cross"></div>
+      <div class="cross v"></div>
+      <div class="ping"></div>
+      <div class="ping p2"></div>
+      <div class="sweep"></div>
+      <span class="blip b1"></span><span class="blip b2"></span><span class="blip b3"></span>
+      <span class="me"></span>
+    </div>
+    <p class="note center">الرادار توضيحي، ولا يعرض سيارات حقيقية.</p>
+  </section>
+
+  <section class="card reveal" id="wave">
+    <div class="eyebrow-sm">توضيح</div>
+    <h2>كيف تكبر الفرملة الصغيرة؟</h2>
+    <p class="sub">تفرمل السيارة الأمامية أولاً، ثم تفرمل السيارة التي خلفها بقوة أكبر، فتنتقل الموجة إلى الخلف.</p>
+    <div class="road" aria-hidden="true">
+      <i class="car" style="--d:8"></i><i class="car" style="--d:7"></i><i class="car" style="--d:6"></i><i class="car" style="--d:5"></i><i class="car" style="--d:4"></i><i class="car" style="--d:3"></i><i class="car" style="--d:2"></i><i class="car" style="--d:1"></i><i class="car" style="--d:0"></i>
+    </div>
+    <p class="note center">رسم توضيحي فقط، والأرقام ليست بيانات حقيقية.</p>
+  </section>
+
+  <section class="card reveal" id="test">
+    <div class="eyebrow-sm">جرّب بنفسك</div>
+    <h2>تجربة الفرملة</h2>
+    <p class="sub">افتح الصفحة على هاتفين في مكانين متقاربين، واسمح بالموقع والمستشعر. تعمل التجربة ما دامت الصفحة مفتوحة.</p>
+    <div class="row">
+      <button id="test-btn" class="alt" disabled>فرملة تجريبية</button>
+    </div>
+    <p class="note">تُكشف الفرملة الحقيقية من المستشعر وسرعة نظام تحديد المواقع. ويعمل الزر التجريبي دون حركة.</p>
+    <div id="log">في انتظار البداية...</div>
+  </section>
+
+  <section class="card reveal" id="score">
+    <div class="eyebrow-sm">نقاطك</div>
+    <h2>نظام النقاط</h2>
+    <div class="score">
+      <div class="score-num" id="scoreNum">0</div>
+      <div class="score-meta">
+        <div class="level" id="levelName">سائق جديد</div>
+        <div class="bar"><i id="levelBar"></i></div>
+        <div class="note" id="levelNext">أول مستوى عند ٥٠ نقطة</div>
+      </div>
+    </div>
+    <p class="score-rule">كل تنبيه تستجيب له بتهدئة سلسة بعد الرسالة = <b>١٠ نقاط</b>. الفرملة القوية لا تُكسب نقاطاً.</p>
+    <div class="row"><button id="resetScore" class="alt">تصفير النقاط</button></div>
+  </section>
+
+  <section class="card reveal" id="how">
+    <div class="eyebrow-sm">كيف يعمل</div>
+    <h2>كيف يعمل Flow؟</h2>
+    <p class="sub">أربع خطوات فقط، وكلها تتم في ثوانٍ.</p>
+    <div class="steps">
+      <div class="step"><span class="num">١</span><div><b>الفرملة</b><span>تفرمل السيارة بقوة، فيستشعر الهاتف ذلك.</span></div></div>
+      <div class="step"><span class="num">٢</span><div><b>الإرسال</b><span>يرسل الهاتف إلى الخادم: "لقد فرملتُ".</span></div></div>
+      <div class="step"><span class="num">٣</span><div><b>التحديد</b><span>يحدد الخادم السيارات التي خلفك على الطريق نفسه ضمن نطاق ٥٠٠ متر.</span></div></div>
+      <div class="step"><span class="num">٤</span><div><b>التنبيه</b><span>يهتز هاتف السائق الذي خلفك ويتلقى تنبيهاً صوتياً، فيخفف السرعة بهدوء.</span></div></div>
+    </div>
+  </section>
+
+  <section class="card reveal" id="privacy">
+    <div class="eyebrow-sm">الأمان</div>
+    <h2>الخصوصية أولاً</h2>
+    <p class="sub">الخصوصية جزء من التصميم منذ اليوم الأول.</p>
+    <ul class="check">
+      <li>لا يوجد حساب، ولا اسم أو رقم هاتف.</li>
+      <li>يُرسل الموقع فقط أثناء فتح التطبيق.</li>
+      <li>تُمحى البيانات من الذاكرة بعد دقيقة، ولا يُحفظ سجل للتحركات.</li>
+    </ul>
+  </section>
+
+  <section class="card reveal" id="settings">
+    <div class="eyebrow-sm">تحكم</div>
+    <h2>الإعدادات</h2>
+    <p class="sub">اختر طريقة التنبيه التي تناسبك.</p>
+    <label class="switch-row">
+      <span>التنبيه الصوتي</span>
+      <input type="checkbox" id="voice" checked>
+    </label>
+  </section>
+
+  <footer>Flow · نموذج أولي للتجربة</footer>
+</main>
+
+<nav class="bottom" aria-label="التنقل">
+  <a href="#home">الرئيسية</a>
+  <a href="#test">التجربة</a>
+  <a href="#how">كيف يعمل</a>
+  <a href="#privacy">الخصوصية</a>
+</nav>
+
+<div id="alert" role="alert" aria-live="assertive"></div>
+
+<script>
+(function () {
+  document.documentElement.classList.add("js");
+  const splash = document.getElementById("splash");
+  setTimeout(() => { splash.classList.add("hide"); setTimeout(() => splash.remove(), 700); }, 1300);
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  } else {
+    document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const myId = (() => {
+    try {
+      let v = localStorage.getItem("gj-id");
+      if (!v) { v = crypto.randomUUID(); localStorage.setItem("gj-id", v); }
+      return v;
+    } catch { return crypto.randomUUID(); }
+  })();
+
+  const TH_MS2 = 4.5;      // حد التسارع (م/ث²) الذي يُعد فرملة قوية
+  const DROP_MS = 2;       // أقل انخفاض في السرعة خلال ١.٥ ثانية
+  const pos = { lat: null, lng: null, heading: 0, speed: null };
+  const speeds = [];       // [time, speed]
+  let es = null, lastBrakeAt = 0, audio = null, started = false;
+
+  // ===== نظام النقاط =====
+  // تُحفظ النقاط على الجهاز فقط، ولا تُرسل إلى الخادم.
+  const SCORE_KEY = "gj-score";
+  const AWARD = 10;
+  let score = 0, pending = null;
+  try { score = Number(localStorage.getItem(SCORE_KEY)) || 0; } catch {}
+  function saveScore() { try { localStorage.setItem(SCORE_KEY, String(score)); } catch {} }
+  function renderScore(bump) {
+    const lvl = score < 50 ? ["سائق جديد", score / 50, "أول مستوى عند ٥٠ نقطة"]
+      : score < 150 ? ["سائق واعٍ", (score - 50) / 100, "المستوى التالي عند ١٥٠ نقطة"]
+      : ["سائق هادئ", 1, "وصلت إلى أعلى مستوى"];
+    $("scoreNum").textContent = score;
+    $("levelName").textContent = lvl[0];
+    $("levelBar").style.width = Math.round(lvl[1] * 100) + "%";
+    $("levelNext").textContent = lvl[2];
+    if (bump) { const n = $("scoreNum"); n.classList.remove("bump"); void n.offsetWidth; n.classList.add("bump"); }
+  }
+  function award(reason) {
+    score += AWARD; saveScore(); renderScore(true);
+    log(`+${AWARD} نقاط: ${reason}`);
+  }
+
+  function log(msg) {
+    const t = new Date().toLocaleTimeString("ar-AE", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    $("log").textContent = `[${t}] ${msg}\n` + $("log").textContent;
+  }
+  function chip(id, text, ok) {
+    const el = $(id); el.textContent = text;
+    el.className = "chip " + (ok === true ? "ok" : ok === false ? "bad" : "");
+  }
+
+  function beep() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = 880; g.gain.value = 0.2;
+      o.connect(g); g.connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + 0.4);
+    } catch {}
+  }
+
+  function speak(text) {
+    try {
+      if (!("speechSynthesis" in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "ar-SA";
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    } catch {}
+  }
+
+  function showAlert(text) {
+    const a = $("alert");
+    a.textContent = text;
+    a.classList.add("show");
+    // نبدأ المراقبة: هل خفّف السائق السرعة بهدوء خلال ٨ ثوانٍ من التنبيه؟
+    pending = { until: Date.now() + 8000, startSpeed: pos.speed, hard: false };
+    clearTimeout(showAlert.t);
+    showAlert.t = setTimeout(() => a.classList.remove("show"), 6000);
+    beep();
+    if ($("voice").checked) speak(text);
+    try { navigator.vibrate && navigator.vibrate([400, 200, 400]); } catch {}
+  }
+
+  async function post(path, body) {
+    try {
+      const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      return r.ok ? await r.json().catch(() => ({})) : null;
+    } catch { return null; }
+  }
+
+  function sendBrake() {
+    const now = Date.now();
+    if (now - lastBrakeAt < 5000) return;     // لا نرسل أكثر من مرة كل ٥ ثوانٍ
+    lastBrakeAt = now;
+    if (pos.lat == null) { log("لا يوجد موقع بعد، ولا يمكن إرسال الفرملة."); return; }
+    post("/brake", { id: myId, eventId: crypto.randomUUID(), lat: pos.lat, lng: pos.lng, heading: pos.heading })
+      .then((r) => log(r ? `أُرسلت الفرملة. عدد السيارات التي تلقّت التنبيه: ${r.sent ?? 0}` : "فشل الإرسال إلى الخادم."));
+  }
+
+  function speedDrop() {
+    const now = Date.now();
+    const old = speeds.find(([t]) => now - t <= 1600);
+    if (!old || pos.speed == null) return 0;
+    return old[1] - pos.speed;
+  }
+
+  function onMotion(e) {
+    const a = e.acceleration;
+    if (!a || a.x == null) return;
+    const mag = Math.hypot(a.x, a.y, a.z);
+    if (pending && mag >= TH_MS2) pending.hard = true;   // الفرملة القوية تلغي النقاط
+    if (mag >= TH_MS2 && speedDrop() >= DROP_MS) sendBrake();
+  }
+
+  function onPos(p) {
+    pos.lat = p.coords.latitude; pos.lng = p.coords.longitude;
+    pos.speed = p.coords.speed ?? null;
+    if (p.coords.heading != null && pos.speed > 2) pos.heading = p.coords.heading;
+    speeds.push([Date.now(), pos.speed ?? 0]);
+    while (speeds.length && Date.now() - speeds[0][0] > 4000) speeds.shift();
+    chip("cLoc", "الموقع: يعمل", true);
+    if (pending) {
+      if (Date.now() > pending.until) pending = null;
+      else if (pending.startSpeed >= 5 && pos.speed != null && !pending.hard && pending.startSpeed - pos.speed >= 1) {
+        pending = null;
+        award("تهدئة سلسة بعد التنبيه");
+      }
+    }
+    if (!es) connect();
+  }
+
+  function connect() {
+    const q = new URLSearchParams({ id: myId, lat: pos.lat, lng: pos.lng, heading: pos.heading });
+    es = new EventSource("/events?" + q.toString());
+    es.onopen = () => { chip("cNet", "الاتصال: متصل", true); $("live").classList.add("on"); log("تم الاتصال بالخادم، في انتظار التنبيهات."); };
+    es.onerror = () => { chip("cNet", "الاتصال: جارٍ إعادة الاتصال", false); $("live").classList.remove("on"); };
+    es.addEventListener("warn", (e) => {
+      const d = JSON.parse(e.data).distance;
+      log(`تنبيه: فرملة أمامك على بعد ${d} متر`);
+      showAlert(`فرملة أمامك على بعد ${d} متر`);
+    });
+  }
+
+  function startPositionLoop() {
+    setInterval(() => {
+      if (pos.lat != null) post("/position", { id: myId, lat: pos.lat, lng: pos.lng, heading: pos.heading });
+    }, 2000);
+  }
+
+  async function start() {
+    if (started) return;
+    started = true;
+    $("start").disabled = true;
+    $("test-btn").disabled = false;
+    try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+
+    if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
+      try {
+        const r = await DeviceMotionEvent.requestPermission();
+        chip("cMot", "المستشعر: " + (r === "granted" ? "يعمل" : "مرفوض"), r === "granted");
+        if (r === "granted") window.addEventListener("devicemotion", onMotion);
+      } catch { chip("cMot", "المستشعر: مرفوض", false); }
+    } else if (window.DeviceMotionEvent) {
+      window.addEventListener("devicemotion", onMotion);
+      chip("cMot", "المستشعر: يعمل", true);
+    } else {
+      chip("cMot", "المستشعر: غير متاح", false);
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(onPos, (err) => {
+        chip("cLoc", "الموقع: مرفوض", false);
+        log("الموقع غير متاح: " + err.message);
+      }, { enableHighAccuracy: true, maximumAge: 1000 });
+    } else {
+      chip("cLoc", "الموقع: غير متاح", false);
+    }
+    startPositionLoop();
+    log("بدأت التجربة. عند رصد فرملة قوية سيُرسل التنبيه تلقائياً.");
+  }
+
+  renderScore(false);
+  $("resetScore").addEventListener("click", () => { score = 0; saveScore(); renderScore(false); log("تم تصفير النقاط."); });
+  $("start").addEventListener("click", start);
+  $("test-btn").addEventListener("click", () => { log("فرملة تجريبية"); lastBrakeAt = 0; sendBrake(); });
+})();
+</script>
+</body>
+</html>
